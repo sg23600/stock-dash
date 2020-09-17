@@ -2,7 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import yfinance as yf
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import pandas as pd
 import plotly.graph_objs as go
@@ -31,17 +31,11 @@ app.layout = html.Div(
             [
                 # Navigation
                 html.P("Choose a ticker to start", className="start"),
-                dcc.Dropdown("dropdown_tickers",
-                             options=[{
-                                 "label": "Apple",
-                                 "value": "AAPL"
-                             }, {
-                                 "label": "Tesla",
-                                 "value": "TSLA"
-                             }, {
-                                 "label": "Facebook",
-                                 "value": "FB"
-                             }]),
+                html.Div([
+                    "Input stock code: ",
+                    dcc.Input(id="dropdown_tickers", type="text"),
+                    html.Button("Submit", id='submit'),
+                ]),
                 html.Div([
                     html.Button(
                         "Stock Price", className="stock-btn", id="stock"),
@@ -76,19 +70,20 @@ app.layout = html.Div(
     Output("description", "children"),
     Output("logo", "src"),
     Output("ticker", "children")
-], [Input("dropdown_tickers", "value")])
-def update_data(val):  # inpur parameter(s)
+], [Input("submit", "n_clicks")], [State("dropdown_tickers", "value")])
+def update_data(v2, val):  # inpur parameter(s)
     if val == None:
         raise PreventUpdate
-
     ticker = yf.Ticker(val)
     inf = ticker.info
-
     df = pd.DataFrame().from_dict(inf, orient="index").T
     df[['logo_url', 'shortName', 'longBusinessSummary']]
-    #print(df)
-    return df['longBusinessSummary'].values[0], df['logo_url'].values[0], df[
-        'shortName'].values[0]
+
+    if val == None:
+        return [""]
+    else:
+        return df['longBusinessSummary'].values[0], df['logo_url'].values[
+            0], df['shortName'].values[0]
 
 
 # callback for stocks graphs
@@ -103,8 +98,11 @@ def stock_price(v1, v2):
     df.reset_index(inplace=True)
 
     fig = get_stock_price_fig(df)
-    print(df)
-    return [dcc.Graph(figure=fig)]
+
+    if v2 == None:
+        return [""]
+    else:
+        return [dcc.Graph(figure=fig)]
 
 
 # callback for indicators
