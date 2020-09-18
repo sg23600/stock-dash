@@ -1,6 +1,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+from datetime import datetime as dt
 import yfinance as yf
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -28,7 +29,9 @@ def get_dounts(df, label):
     return fig
 
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=[
+    "https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+])
 server = app.server
 
 app.layout = html.Div(
@@ -36,7 +39,7 @@ app.layout = html.Div(
         html.Div(
             [
                 # Navigation
-                html.P("Choose a ticker to start", className="start"),
+                html.P("Welcome to the Stock Dash App!", className="start"),
                 html.Div([
                     "Input stock code: ",
                     dcc.Input(id="dropdown_tickers", type="text"),
@@ -49,7 +52,15 @@ app.layout = html.Div(
                                 className="indicators-btn",
                                 id="indicators")
                 ],
-                         className="buttons")
+                         className="buttons"),
+                html.Div([
+                    dcc.DatePickerRange(id='my-date-picker-range',
+                                        min_date_allowed=dt(1995, 8, 5),
+                                        max_date_allowed=dt.now(),
+                                        initial_visible_month=dt.now(),
+                                        end_date=dt.now().date()),
+                ],
+                         className="date")
             ],
             className="nav"),
 
@@ -58,8 +69,8 @@ app.layout = html.Div(
             [
                 html.Div(
                     [  # header
-                        html.P(id="ticker"),
-                        html.Img(id="logo")
+                        html.Img(id="logo"),
+                        html.P(id="ticker")
                     ],
                     className="header"),
                 html.Div(id="description", className="decription_ticker"),
@@ -93,22 +104,30 @@ def update_data(v2, val):  # inpur parameter(s)
 
 
 # callback for stocks graphs
-@app.callback([Output("graphs-content", "children")],
-              [Input("stock", "n_clicks"),
-               Input("dropdown_tickers", "value")])
-def stock_price(v1, v2):
+@app.callback([Output("graphs-content", "children")], [
+    Input("stock", "n_clicks"),
+    Input("dropdown_tickers", "value"),
+    Input('my-date-picker-range', 'start_date'),
+    Input('my-date-picker-range', 'end_date')
+])
+def stock_price(v1, v2, start_date, end_date):
     if v1 == None:
         raise PreventUpdate
-
-    df = yf.download(v2)
-    df.reset_index(inplace=True)
-
-    fig = get_stock_price_fig(df)
-
     if v2 == None:
         return [""]
     else:
-        return [dcc.Graph(figure=fig)]
+        if start_date != None:
+            df = yf.download('TSLA', str(start_date), str(end_date))
+            df.reset_index(inplace=True)
+
+            fig = get_stock_price_fig(df)
+            return [dcc.Graph(figure=fig)]
+        else:
+            df = yf.download(v2)
+            df.reset_index(inplace=True)
+
+            fig = get_stock_price_fig(df)
+            return [dcc.Graph(figure=fig)]
 
 
 # callback for indicators

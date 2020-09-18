@@ -1,0 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: 0;
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+}
+.container {
+  display: flex;
+}
+
+.nav {
+  /*position: fixed;*/
+  width: 25vw;
+  /* height: 100%; */
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  background-color: rgb(5, 107, 107);
+}
+
+.content {
+  width: 65vw;
+  padding: 1rem 5rem;
+}
+
+.start {
+  margin-top: 2rem;
+  margin-bottom: 5rem;
+  text-align: center;
+  font-size: larger;
+  color: rgb(166, 243, 248);
+}
+
+.buttons {
+  margin: 2rem;
+}
