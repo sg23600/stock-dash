@@ -6,11 +6,16 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import pandas as pd
 import plotly.graph_objs as go
+import plotly.express as px
 
 
 def get_stock_price_fig(df):
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(mode='lines', x=df['Date'], y=df['Close']))
+
+    fig = px.line(df,
+                  x="Date",
+                  y=["Close", "Open"],
+                  title="Closing and Openning Price vs Date")
+
     return fig
 
 
@@ -24,6 +29,7 @@ def get_dounts(df, label):
 
 
 app = dash.Dash()
+server = app.server
 
 app.layout = html.Div(
     [
@@ -149,4 +155,5 @@ def indicators(v1, v2):
                      id="graphs-contents")], None  #[dcc.Graph(figure=fig)]
 
 
-app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(debug=True)
