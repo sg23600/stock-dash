@@ -33,7 +33,7 @@ app = dash.Dash(external_stylesheets=[
     "https://fonts.googleapis.com/css2?family=Roboto&display=swap"
 ])
 server = app.server
-
+# html layout of site
 app.layout = html.Div(
     [
         html.Div(
@@ -41,10 +41,14 @@ app.layout = html.Div(
                 # Navigation
                 html.P("Welcome to the Stock Dash App!", className="start"),
                 html.Div([
-                    "Input stock code: ",
-                    dcc.Input(id="dropdown_tickers", type="text"),
-                    html.Button("Submit", id='submit'),
-                ]),
+                    html.P("Input stock code: "),
+                    html.Div([
+                        dcc.Input(id="dropdown_tickers", type="text"),
+                        html.Button("Submit", id='submit'),
+                    ],
+                             className="form")
+                ],
+                         className="input-place"),
                 html.Div([
                     html.Button(
                         "Stock Price", className="stock-btn", id="stock"),
@@ -86,21 +90,22 @@ app.layout = html.Div(
 @app.callback([
     Output("description", "children"),
     Output("logo", "src"),
-    Output("ticker", "children")
+    Output("ticker", "children"),
 ], [Input("submit", "n_clicks")], [State("dropdown_tickers", "value")])
-def update_data(v2, val):  # inpur parameter(s)
-    if val == None:
+def update_data(n, val):  # inpur parameter(s)
+    if n == None:
         raise PreventUpdate
-    ticker = yf.Ticker(val)
-    inf = ticker.info
-    df = pd.DataFrame().from_dict(inf, orient="index").T
-    df[['logo_url', 'shortName', 'longBusinessSummary']]
-
-    if val == None:
-        return [""]
     else:
-        return df['longBusinessSummary'].values[0], df['logo_url'].values[
-            0], df['shortName'].values[0]
+        ticker = yf.Ticker(val)
+        inf = ticker.info
+        df = pd.DataFrame().from_dict(inf, orient="index").T
+        df[['logo_url', 'shortName', 'longBusinessSummary']]
+
+        if val == None:
+            return [""]
+        else:
+            return df['longBusinessSummary'].values[0], df['logo_url'].values[
+                0], df['shortName'].values[0]
 
 
 # callback for stocks graphs

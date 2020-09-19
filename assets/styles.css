@@ -36,6 +36,46 @@ body {
   color: rgb(166, 243, 248);
 }
 
+.input-place p {
+  color: antiquewhite;
+  font-size: larger;
+}
+.form {
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  height: 1.5rem;
+}
+.form button {
+  width: 5rem;
+  background-color: yellow;
+  color: black;
+  border: none;
+}
 .buttons {
   margin: 2rem;
+  width: 100%;
+  display: flex;
+  position: relative;
+  justify-content: space-around;
+}
+
+.buttons button {
+  width: 7.5rem;
+  height: 2.5rem;
+  border: none;
+  background-color: rgb(166, 255, 0);
+  color: rgb(0, 0, 0);
+}
+
+.header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.header p {
+  font-size: 4rem;
+  margin-left: 3rem;
+  line-height: 80%;
 }
