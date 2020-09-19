@@ -111,20 +111,20 @@ def update_data(n, val):  # inpur parameter(s)
 # callback for stocks graphs
 @app.callback([Output("graphs-content", "children")], [
     Input("stock", "n_clicks"),
-    Input("dropdown_tickers", "value"),
     Input('my-date-picker-range', 'start_date'),
     Input('my-date-picker-range', 'end_date')
-])
-def stock_price(v1, v2, start_date, end_date):
-    if v1 == None:
+],
+    [State("dropdown_tickers", "value")])
+def stock_price(n, start_date, end_date, val):
+    if n == None:
         raise PreventUpdate
-    if v2 == None:
-        return [""]
+    if val == None:
+        raise PreventUpdate
     else:
         if start_date != None:
-            df = yf.download(v2, str(start_date), str(end_date))
+            df = yf.download(val, str(start_date), str(end_date))
         else:
-            df = yf.download(v2)
+            df = yf.download(val)
 
     df.reset_index(inplace=True)
     fig = get_stock_price_fig(df)
