@@ -117,17 +117,13 @@ def stock_price(v1, v2, start_date, end_date):
         return [""]
     else:
         if start_date != None:
-            df = yf.download('TSLA', str(start_date), str(end_date))
-            df.reset_index(inplace=True)
-
-            fig = get_stock_price_fig(df)
-            return [dcc.Graph(figure=fig)]
+            df = yf.download(v2, str(start_date), str(end_date))
         else:
             df = yf.download(v2)
-            df.reset_index(inplace=True)
 
-            fig = get_stock_price_fig(df)
-            return [dcc.Graph(figure=fig)]
+    df.reset_index(inplace=True)
+    fig = get_stock_price_fig(df)
+    return [dcc.Graph(figure=fig)]
 
 
 # callback for indicators
