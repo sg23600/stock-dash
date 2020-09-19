@@ -79,3 +79,8 @@ body {
   margin-left: 3rem;
   line-height: 80%;
 }
+
+#logo {
+  max-width: 15rem;
+  height: auto;
+}

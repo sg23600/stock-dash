@@ -20,12 +20,13 @@ def get_stock_price_fig(df):
     return fig
 
 
-def get_dounts(df, label):
-    non_main = 1 - df.values[0]
-    labels = ["main", label]
-    values = [non_main, df.values[0]]
-
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.499)])
+def get_more(df):
+    df['EWA_4'] = df['Close'].ewm(span=4, adjust=False).mean()
+    fig = px.scatter(df,
+                     x="Date",
+                     y="EWA_4",
+                     title="Exponential Moving Average vs Date")
+    fig.update_traces(mode='lines+markers')
     return fig
 
 
@@ -78,8 +79,8 @@ app.layout = html.Div(
                     ],
                     className="header"),
                 html.Div(id="description", className="decription_ticker"),
-                html.Div([html.Div([], id="graphs-content")],
-                         id="main-content")
+                html.Div([], id="graphs-content"),
+                html.Div([], id="main-content")
             ],
             className="content"),
     ],
@@ -91,33 +92,37 @@ app.layout = html.Div(
     Output("description", "children"),
     Output("logo", "src"),
     Output("ticker", "children"),
+    Output("stock", "n_clicks"),
+    Output("indicators", "n_clicks")
 ], [Input("submit", "n_clicks")], [State("dropdown_tickers", "value")])
 def update_data(n, val):  # inpur parameter(s)
     if n == None:
-        raise PreventUpdate
+        return "Hey there! Please enter a legitimate stock code to get details.", "https://melmagazine.com/wp-content/uploads/2019/07/Screen-Shot-2019-07-31-at-5.47.12-PM.png", "Stonks", None, None
+        # raise PreventUpdate
     else:
-        ticker = yf.Ticker(val)
-        inf = ticker.info
-        df = pd.DataFrame().from_dict(inf, orient="index").T
-        df[['logo_url', 'shortName', 'longBusinessSummary']]
-
         if val == None:
-            return [""]
+            raise PreventUpdate
         else:
+            ticker = yf.Ticker(val)
+            inf = ticker.info
+            df = pd.DataFrame().from_dict(inf, orient="index").T
+            df[['logo_url', 'shortName', 'longBusinessSummary']]
             return df['longBusinessSummary'].values[0], df['logo_url'].values[
-                0], df['shortName'].values[0]
+                0], df['shortName'].values[0], None, None
 
 
 # callback for stocks graphs
-@app.callback([Output("graphs-content", "children")], [
+@app.callback([
+    Output("graphs-content", "children"),
+], [
     Input("stock", "n_clicks"),
     Input('my-date-picker-range', 'start_date'),
     Input('my-date-picker-range', 'end_date')
-],
-    [State("dropdown_tickers", "value")])
+], [State("dropdown_tickers", "value")])
 def stock_price(n, start_date, end_date, val):
     if n == None:
-        raise PreventUpdate
+        return [""]
+        #raise PreventUpdate
     if val == None:
         raise PreventUpdate
     else:
@@ -132,47 +137,25 @@ def stock_price(n, start_date, end_date, val):
 
 
 # callback for indicators
-@app.callback(
-    [Output("main-content", "children"),
-     Output("stock", "n_clicks")],
-    [Input("indicators", "n_clicks"),
-     Input("dropdown_tickers", "value")])
-def indicators(v1, v2):
-    if v1 == None:
+@app.callback([Output("main-content", "children")], [
+    Input("indicators", "n_clicks"),
+    Input('my-date-picker-range', 'start_date'),
+    Input('my-date-picker-range', 'end_date')
+], [State("dropdown_tickers", "value")])
+def indicators(n, start_date, end_date, val):
+    if n == None:
+        return [""]
+    if val == None:
         raise PreventUpdate
 
-    ticker = yf.Ticker(v2)
-    df_info = pd.DataFrame.from_dict(ticker.info, orient="index").T
-    df_info = df_info[[
-        "priceToBook", "profitMargins", "bookValue", "enterpriseToEbitda",
-        "shortRatio", "beta", "payoutRatio", "trailingEps"
-    ]]
+    if start_date == None:
+        df_more = yf.download(val)
+    else:
+        df_more = yf.download(val, str(start_date), str(end_date))
 
-    kpi_data = html.Div([
-        html.Div([
-            html.Div([
-                html.H4("Price to Book"),
-                html.P(df_info["priceToBook"]),
-            ]),
-            html.Div([
-                html.H4("Enterprise to Ebitda"),
-                html.P(df_info["enterpriseToEbitda"]),
-            ]),
-            html.Div([
-                html.H4("Beta"),
-                html.P(df_info["beta"]),
-            ])
-        ],
-                 className="kpi"),
-        html.Div([
-            dcc.Graph(figure=get_dounts(df_info["profitMargins"], "Margins"))
-        ]),
-        html.Div(
-            [dcc.Graph(figure=get_dounts(df_info["payoutRatio"], "Payout"))])
-    ],
-                        className="dounuts")
-    return [html.Div([kpi_data],
-                     id="graphs-contents")], None  #[dcc.Graph(figure=fig)]
+    df_more.reset_index(inplace=True)
+    fig = get_more(df_more)
+    return [dcc.Graph(figure=fig)]
 
 
 if __name__ == '__main__':
