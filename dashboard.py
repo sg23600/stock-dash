@@ -21,7 +21,7 @@ def get_stock_price_fig(df):
 
 
 def get_more(df):
-    df['EWA_4'] = df['Close'].ewm(span=4, adjust=False).mean()
+    df['EWA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
     fig = px.scatter(df,
                      x="Date",
                      y="EWA_4",
