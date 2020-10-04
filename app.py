@@ -33,9 +33,11 @@ def get_more(df):
     return fig
 
 
-app = dash.Dash(external_stylesheets=[
-    "https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-])
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[
+        "https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+    ])
 server = app.server
 # html layout of site
 app.layout = html.Div(
