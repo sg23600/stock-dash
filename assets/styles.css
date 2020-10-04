@@ -56,10 +56,18 @@ body {
   margin: 2rem;
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   position: relative;
   justify-content: space-around;
 }
-
+#forecast {
+  margin-top: 2rem;
+  height: 2.2rem;
+}
+#n_days {
+  height: 2rem;
+  margin-top: 2rem;
+}
 .buttons button {
   width: 7.5rem;
   height: 2.5rem;
