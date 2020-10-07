@@ -3,7 +3,6 @@ dash-core-components==1.12.1
 dash-html-components==1.1.1
 dash-renderer==1.8.2
 dash-table==4.10.1
-dbus-python==1.2.16
 Flask==1.1.2
 Flask-Compress==1.5.0
 gunicorn==20.0.4
